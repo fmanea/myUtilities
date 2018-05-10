@@ -16,15 +16,22 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--enable", type=str2bool, nargs='?',
                         const=True, default="False",
                         help="Enable/Disable incrementBuild mode.")
+parser.add_argument("--resource_path", help="The path to the .rc file, in order to modify it")                        
 args = parser.parse_args()
+
 if args.enable:
+    if args.resource_path is None:
+        parser.error("--resoarce_path not provided, when enable is set to true, --resource_path should be provided")
+        exit()
     print ("Incrementing Build version")
 else:
     print ("Incrementual building is deactivated") 
     exit()
+if not os.path.isfile(args.resource_path):
+    print ("The root search path is not valid, please add a valid search path")
+    exit()
 
-resourceFileName = "InfoSrvService.rc"
-resourceFilePath = os.path.join(os.path.dirname(__file__), resourceFileName)
+resourceFilePath = args.resource_path
 
 for line in fileinput.FileInput(resourceFilePath, inplace=False):
     if "FILEVERSION" in line: 
